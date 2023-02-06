@@ -1,0 +1,32 @@
+---
+- name: Setup webserver
+  hosts: all
+  remote_user: admin
+
+  tasks:
+    - name: Install apache2 & php8.1
+      script: scripts/apache.sh
+
+    - name: Enable PHP FPM
+      shell: |
+        a2enmod proxy_fcgi setenvif
+        a2enconf php8.2-fpm
+      become: yes
+
+    - name: Restart apache
+      service:
+        name: apache2
+        state: restarted
+      become: yes
+
+    - name: Copy index.php
+      copy:
+        src: mytemplates/index.php
+        dest: /var/www/html/index.php
+      become: yes
+
+    - name: Restart apache
+      service:
+        name: apache2
+        state: restarted
+      become: yes
