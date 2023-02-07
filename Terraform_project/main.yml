@@ -1,11 +1,11 @@
 ---
 - name: Setup webserver
-  hosts: all
-  remote_user: admin
+  hosts: webserver
+  # remote_user: admin
 
   tasks:
     - name: Install apache2 & php8.1
-      script: scripts/apache.sh
+      script: ./scripts/apache.sh
 
     - name: Enable PHP FPM
       shell: |
