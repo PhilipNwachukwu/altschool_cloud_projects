@@ -1,16 +1,77 @@
 ---
 - name: Setup webserver
   hosts: webserver
-  # remote_user: admin
+  become: yes
 
   tasks:
-    - name: Install apache2 & php8.1
-      script: ./scripts/apache.sh
+    - name: Run apt update and upgrade
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 432000
+
+    - name: Install Apache2
+      ansible.builtin.apt:
+        name: apache2
+        state: latest
+        update_cache: yes
+
+    - name: Install php rerequisites
+      ansible.builtin.apt:
+        pkg:
+          - ca-certificates
+          - apt-transport-https
+          - software-properties-common
+          - lsb-release
+          - gnupg2
+          - gnupg
+          - curl
+
+    # - name: Get php8 repository
+    #   command: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+
+    # - name: Add php8 package signing key
+    #   ansible.builtin.get_url:
+    #     url: https://packages.sury.org/php/apt.gpg
+    #     dest: /etc/apt/trusted.gpg.d/sury-keyring.gpg
+
+    # - name: Apt update
+    #   ansible.builtin.apt:
+    #     update_cache: yes
+
+    - name: Add php8.1 package
+      script: scripts/apache.sh
+
+    # - name: One way to avoid apt_key once it is removed from your distro
+    #   block:
+    #     - name: phprepo |no apt key
+    #       ansible.builtin.get_url:
+    #         url: https://packages.sury.org/php/apt.gpg
+    #         dest: /etc/apt/trusted.gpg.d/php.gpg
+
+    #     - name: phprepo | apt source
+    #       ansible.builtin.apt_repository:
+    #         filename: /etc/apt/sources.list.d/php.list
+    #         repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main"
+    #         state: present
+    #         update_cache: true
+
+    - name: Install php8.1
+      ansible.builtin.apt:
+        name: php8.1-fpm
+        state: latest
+        update_cache: yes
+
+    - name: Install fcgid
+      ansible.builtin.apt:
+        name: libapache2-mod-fcgid
+        state: latest
+        update_cache: yes
 
     - name: Enable PHP FPM
       shell: |
         a2enmod proxy_fcgi setenvif
-        a2enconf php8.2-fpm
+        a2enconf php8.1-fpm
       become: yes
 
     - name: Restart apache
@@ -18,6 +79,15 @@
         name: apache2
         state: restarted
       become: yes
+
+    - name: Get stats of index.html
+      ansible.builtin.stat:
+        path: /var/www/html/index.html
+      register: index
+
+    - name: Move index.html to index.php if it exists
+      command: mv /var/www/html/index.html /var/www/html/index.php
+      when: index.stat.exists
 
     - name: Copy index.php
       copy:

@@ -59,18 +59,18 @@ resource "null_resource" "remote-exec" {
     }
   }
 
-  provisioner "local-exec" {
-    command = "export ANSIBLE_CONFIG=./ansible.cfg"
-  }
+  # provisioner "local-exec" {
+  #   command = "export ANSIBLE_CONFIG=./ansible.cfg"
+  # }
 
   provisioner "local-exec" {
-    command = "ansible webserver -m shell -a 'main.yml'"
+    # command = "ansible webserver -m shell -a 'main.yml'"
 
     # provisioner "local-exec" {
-    #   command = "ansible-playbook -u admin -i '${aws_instance.web_server[0].public_ip}, ${aws_instance.web_server[1].public_ip}, ${aws_instance.web_server[2].public_ip}' --private-key ${local_file.ssh_key.filename} main.yml"
-    # }
+    command = "ansible-playbook -u admin -i ${local_file.instance_ip.filename} --private-key ${local_file.ssh_key.filename} main.yml"
   }
 }
+
 
 #   provisioner "remote-exec" {
 #     inline = ["sudo apt update", "sudo apt install python3 -y", "echo Done!"]
@@ -155,11 +155,11 @@ resource "local_file" "instance_ip" {
   ]
   content = <<EOT
       [webserver]
-      %{~for host, ip in aws_instance.web_server.*.public_ip~}
+      %{for host, ip in aws_instance.web_server.*.public_ip~}
       ${ip} 
-      %{~endfor~}
+      %{endfor~}
     EOT  
 
-  filename = "/vagrant/altschool_cloud_projects/Terraform_project/ansible/host-inventory"
+  filename = "/vagrant/altschool_cloud_projects/Terraform_project/host-inventory"
 }
 
