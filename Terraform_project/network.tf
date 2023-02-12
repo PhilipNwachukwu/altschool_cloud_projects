@@ -2,10 +2,6 @@
 # DATA
 ##################################################################################
 
-# data "aws_ssm_parameter" "ami" {
-#   name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
-# }
-
 # Debian 11 Bullseye
 data "aws_ami" "debian-11" {
   most_recent = true
@@ -66,40 +62,7 @@ resource "aws_subnet" "subnet" {
   map_public_ip_on_launch = var.map_public_ip_on_launch
 
   tags = local.common_tags
-
-  # tags = {
-
-  #   Name = "My-Subnet-${count.index + 1}"
-  # }
-
 }
-
-# resource "aws_subnet" "subnet1" {
-#   cidr_block              = var.vpc_subnets_cidr_block[0]
-#   vpc_id                  = aws_vpc.vpc.id
-#   map_public_ip_on_launch = var.map_public_ip_on_launch
-#   availability_zone       = data.aws_availability_zones.available.names[0]
-
-#   tags = local.common_tags
-# }
-
-# resource "aws_subnet" "subnet2" {
-#   cidr_block              = var.vpc_subnets_cidr_block[1]
-#   vpc_id                  = aws_vpc.vpc.id
-#   map_public_ip_on_launch = var.map_public_ip_on_launch
-#   availability_zone       = data.aws_availability_zones.available.names[1]
-
-#   tags = local.common_tags
-# }
-
-# resource "aws_subnet" "subnet3" {
-#   cidr_block              = var.vpc_subnets_cidr_block[2]
-#   vpc_id                  = aws_vpc.vpc.id
-#   map_public_ip_on_launch = var.map_public_ip_on_launch
-#   availability_zone       = data.aws_availability_zones.available.names[2]
-
-#   tags = local.common_tags
-# }
 
 # ROUTING #
 resource "aws_route_table" "rtb" {
@@ -120,21 +83,6 @@ resource "aws_route_table_association" "rta" {
   route_table_id = aws_route_table.rtb.id
 
 }
-
-# resource "aws_route_table_association" "rta-subnet1" {
-#   subnet_id      = aws_subnet.subnet.id
-#   route_table_id = aws_route_table.rtb.id
-# }
-
-# resource "aws_route_table_association" "rta-subnet2" {
-#   subnet_id      = aws_subnet.subnet2.id
-#   route_table_id = aws_route_table.rtb.id
-# }
-
-# resource "aws_route_table_association" "rta-subnet3" {
-#   subnet_id      = aws_subnet.subnet3.id
-#   route_table_id = aws_route_table.rtb.id
-# }
 
 # SECURITY GROUPS #
 # Apache security group 

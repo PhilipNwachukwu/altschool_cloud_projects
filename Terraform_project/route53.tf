@@ -12,11 +12,6 @@ resource "aws_route53_record" "ns" {
   zone_id         = aws_route53_zone.apache.zone_id
 
   records = [
-    # var.name_servers[0],
-    # var.name_servers[1],
-    # var.name_servers[2],
-    # var.name_servers[3],
-
     aws_route53_zone.apache.name_servers[0],
     aws_route53_zone.apache.name_servers[1],
     aws_route53_zone.apache.name_servers[2],

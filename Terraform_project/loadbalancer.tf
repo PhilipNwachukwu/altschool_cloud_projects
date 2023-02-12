@@ -1,3 +1,5 @@
+# aws_elb_service_account
+
 # aws_lb
 resource "aws_lb" "apache" {
   name               = var.lb_name
@@ -42,21 +44,3 @@ resource "aws_lb_target_group_attachment" "web_server" {
   target_id        = element(aws_instance.web_server.*.id, count.index)
   port             = var.lb_target_group_attachment_port
 }
-
-# resource "aws_lb_target_group_attachment" "web_server1" {
-#   target_group_arn = aws_lb_target_group.apache_lb_tg.arn
-#   target_id        = aws_instance.web_server[0].id
-#   port             = var.lb_target_group_attachment_port
-# }
-
-# resource "aws_lb_target_group_attachment" "web_server2" {
-#   target_group_arn = aws_lb_target_group.apache_lb_tg.arn
-#   target_id        = aws_instance.web_server[1].id
-#   port             = var.lb_target_group_attachment_port
-# }
-
-# resource "aws_lb_target_group_attachment" "web_server3" {
-#   target_group_arn = aws_lb_target_group.apache_lb_tg.arn
-#   target_id        = aws_instance.web_server[2].id
-#   port             = var.lb_target_group_attachment_port
-# }

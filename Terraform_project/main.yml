@@ -5,19 +5,19 @@
 
   tasks:
     - name: Run apt update and upgrade
-      ansible.builtin.apt:
-        update_cache: yes
-        upgrade: yes
+      apt:
+        update_cache: true
+        upgrade: true
         cache_valid_time: 432000
 
     - name: Install Apache2
-      ansible.builtin.apt:
+      apt:
         name: apache2
         state: latest
         update_cache: yes
 
-    - name: Install php rerequisites
-      ansible.builtin.apt:
+    - name: Install php prerequisites
+      apt:
         pkg:
           - ca-certificates
           - apt-transport-https
@@ -26,44 +26,30 @@
           - gnupg2
           - gnupg
           - curl
+          - wget
+        update_cache: yes
 
-    # - name: Get php8 repository
-    #   command: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+    - name: Get APT Key
+      shell:
+        cmd: wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 
-    # - name: Add php8 package signing key
-    #   ansible.builtin.get_url:
-    #     url: https://packages.sury.org/php/apt.gpg
-    #     dest: /etc/apt/trusted.gpg.d/sury-keyring.gpg
+    - name: Get APT keyring
+      shell:
+        cmd: sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 
-    # - name: Apt update
-    #   ansible.builtin.apt:
-    #     update_cache: yes
-
-    - name: Add php8.1 package
-      script: scripts/apache.sh
-
-    # - name: One way to avoid apt_key once it is removed from your distro
-    #   block:
-    #     - name: phprepo |no apt key
-    #       ansible.builtin.get_url:
-    #         url: https://packages.sury.org/php/apt.gpg
-    #         dest: /etc/apt/trusted.gpg.d/php.gpg
-
-    #     - name: phprepo | apt source
-    #       ansible.builtin.apt_repository:
-    #         filename: /etc/apt/sources.list.d/php.list
-    #         repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main"
-    #         state: present
-    #         update_cache: true
+    - name: Apt update
+      apt:
+        update_cache: true
+        upgrade: true
 
     - name: Install php8.1
-      ansible.builtin.apt:
+      apt:
         name: php8.1-fpm
         state: latest
         update_cache: yes
 
     - name: Install fcgid
-      ansible.builtin.apt:
+      apt:
         name: libapache2-mod-fcgid
         state: latest
         update_cache: yes
@@ -81,7 +67,7 @@
       become: yes
 
     - name: Get stats of index.html
-      ansible.builtin.stat:
+      stat:
         path: /var/www/html/index.html
       register: index
 
